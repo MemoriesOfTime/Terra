@@ -26,7 +26,7 @@ public record NukkitChunk(ServerWorld world, FullChunk nukkitChunk,
         NukkitBlockState nukkitBlockState = (NukkitBlockState) data;
         nukkitChunk.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
         if(nukkitBlockState.containsWater()) {
-            nukkitChunk.setBlockAtLayer(x, y, z, 1, BlockID.WATER, 0);
+            nukkitChunk.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);
         }
     }
 

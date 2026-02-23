@@ -2,13 +2,23 @@ package com.dfsek.terra.nukkit.delegate;
 
 import cn.nukkit.block.Block;
 
+import java.util.Set;
+
 import com.dfsek.terra.api.block.BlockType;
 import com.dfsek.terra.api.block.state.properties.Property;
 import com.dfsek.terra.nukkit.JeBlockState;
-import com.dfsek.terra.nukkit.Mapping;
 
 
 public final class NukkitBlockState implements com.dfsek.terra.api.block.state.BlockState {
+
+    // JE blocks that always exist in water but have no 'waterlogged' property
+    private static final Set<String> IMPLICIT_WATER_BLOCKS = Set.of(
+        "minecraft:seagrass",
+        "minecraft:tall_seagrass",
+        "minecraft:kelp",
+        "minecraft:kelp_plant",
+        "minecraft:bubble_column"
+    );
 
     public static final NukkitBlockState AIR = new NukkitBlockState(0, 0, JeBlockState.fromString("minecraft:air"));
 
@@ -21,7 +31,8 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
         this.blockId = blockId;
         this.metadata = metadata;
         this.jeBlockState = jeBlockState;
-        this.containsWater = "true".equals(jeBlockState.getPropertyValue("waterlogged"));
+        this.containsWater = "true".equals(jeBlockState.getPropertyValue("waterlogged"))
+            || IMPLICIT_WATER_BLOCKS.contains(jeBlockState.getIdentifier());
     }
 
     @Override

@@ -48,6 +48,10 @@ public class JeBlockState {
         return new JeBlockState(identifier, properties);
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     public String getPropertyValue(String key) {
         return properties.get(key);
     }

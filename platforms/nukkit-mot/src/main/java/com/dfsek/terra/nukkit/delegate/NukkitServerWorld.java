@@ -48,7 +48,7 @@ public class NukkitServerWorld implements ServerWorld {
         NukkitBlockState nukkitBlockState = (NukkitBlockState) data;
         chunkManager.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
         if(nukkitBlockState.containsWater()) {
-            chunkManager.setBlockAtLayer(x, y, z, 1, BlockID.WATER, 0);
+            chunkManager.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);
         }
     }
 

@@ -29,7 +29,7 @@ public record NukkitProtoChunk(FullChunk nukkitChunk, DimensionData dimensionDat
         NukkitBlockState nukkitBlockState = (NukkitBlockState) blockState;
         nukkitChunk.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
         if(nukkitBlockState.containsWater()) {
-            nukkitChunk.setBlockAtLayer(x, y, z, 1, BlockID.WATER, 0);
+            nukkitChunk.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);
         }
     }
 
