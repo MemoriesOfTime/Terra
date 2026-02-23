@@ -98,4 +98,9 @@ object Versions {
     object Minestom {
         const val minestom = "2025.10.04-1.21.8"
     }
+
+    object NukkitMOT {
+        const val nukkitMot = "MOT-SNAPSHOT"
+        const val gson = "2.13.2"
+    }
 }

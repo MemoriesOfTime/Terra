@@ -1,0 +1,8 @@
+name: Terra
+main: com.dfsek.terra.nukkit.TerraNukkitPlugin
+version: "@VERSION@"
+api: ["Nukkit-MOT"]
+load: STARTUP
+authors: [ "LT_Name", "dfsek", "duplexsystem", "Astrash", "solonovamax", "Sancires", "Aureus", "RogueShade", "OakLoaf" ]
+website: "@WIKI@"
+description: "@DESCRIPTION@"
