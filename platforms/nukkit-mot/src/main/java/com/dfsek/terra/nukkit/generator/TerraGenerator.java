@@ -2,6 +2,7 @@ package com.dfsek.terra.nukkit.generator;
 
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.DimensionData;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.math.NukkitRandom;
@@ -140,10 +141,26 @@ public class TerraGenerator extends Generator {
     public void populateStructure(int chunkX, int chunkZ) {
         // Structures are handled in populateChunk stages
     }
+    @Override
+    public int getDimension() {
+        String key = options.get("preset") instanceof String s && !s.isEmpty()
+            ? s.trim().split(":")[0] : "";
+        return switch(key) {
+            case "TARTARUS" -> Level.DIMENSION_NETHER;
+            case "REIMAGEND" -> Level.DIMENSION_THE_END;
+            default -> Level.DIMENSION_OVERWORLD;
+        };
+    }
 
     @Override
     public int getId() {
-        return TYPE_INFINITE;
+        String key = options.get("preset") instanceof String s && !s.isEmpty()
+            ? s.trim().split(":")[0] : "";
+        return switch(key) {
+            case "TARTARUS" -> TYPE_NETHER;
+            case "REIMAGEND" -> TYPE_THE_END;
+            default -> TYPE_INFINITE;
+        };
     }
 
     @Override

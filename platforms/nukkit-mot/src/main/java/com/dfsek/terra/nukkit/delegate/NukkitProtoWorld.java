@@ -58,7 +58,7 @@ public class NukkitProtoWorld implements ProtoWorld {
             return;
         }
 
-        NukkitBlockState nukkitBlockState = (NukkitBlockState) data;
+        NukkitBlockState nukkitBlockState = NukkitBlockState.resolve((NukkitBlockState) data);
         chunkManager.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
         if(nukkitBlockState.containsWater()) {
             chunkManager.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);

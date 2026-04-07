@@ -6,3 +6,9 @@ load: STARTUP
 authors: [ "LT_Name", "dfsek", "duplexsystem", "Astrash", "solonovamax", "Sancires", "Aureus", "RogueShade", "OakLoaf" ]
 website: "@WIKI@"
 description: "@DESCRIPTION@"
+
+commands:
+  terradebug:
+    description: 切换 Terra 调试模式
+    usage: /terradebug [on|off]
+    permission: terra.debug

@@ -2,11 +2,17 @@ package com.dfsek.terra.nukkit.delegate;
 
 import cn.nukkit.block.Block;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.dfsek.terra.api.block.BlockType;
 import com.dfsek.terra.api.block.state.properties.Property;
 import com.dfsek.terra.nukkit.JeBlockState;
+
+
+import static com.dfsek.terra.nukkit.config.MyConfig.BLOCK_REPLACEMENTS_ENABLED;
 
 
 public final class NukkitBlockState implements com.dfsek.terra.api.block.state.BlockState {
@@ -21,6 +27,18 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
     );
 
     public static final NukkitBlockState AIR = new NukkitBlockState(0, 0, JeBlockState.fromString("minecraft:air"));
+    public static Map<NukkitBlockState, NukkitBlockState> BLOCK_REPLACEMENTS = new ConcurrentHashMap<>();
+
+    /**
+     * 解析块状态：如果其 blockId 在BLOCK_REPLACEMENTS，返回映射后的替换。
+     */
+    public static NukkitBlockState resolve(NukkitBlockState state) {
+        if(BLOCK_REPLACEMENTS_ENABLED) {
+            NukkitBlockState replacement = BLOCK_REPLACEMENTS.get(state);
+            return replacement == null ? state : replacement;
+        }
+        return state;
+    }
 
     private final int blockId;
     private final int metadata;
@@ -32,7 +50,19 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
         this.metadata = metadata;
         this.jeBlockState = jeBlockState;
         this.containsWater = "true".equals(jeBlockState.getPropertyValue("waterlogged"))
-            || IMPLICIT_WATER_BLOCKS.contains(jeBlockState.getIdentifier());
+                             || IMPLICIT_WATER_BLOCKS.contains(jeBlockState.getIdentifier());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if(!(o instanceof NukkitBlockState that)) return false;
+        return blockId == that.blockId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(blockId);
     }
 
     @Override
