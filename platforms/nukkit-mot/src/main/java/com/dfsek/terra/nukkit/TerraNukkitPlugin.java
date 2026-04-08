@@ -1,6 +1,5 @@
 package com.dfsek.terra.nukkit;
 
-import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -8,7 +7,6 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.level.LevelUnloadEvent;
-import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.plugin.PluginBase;
 
@@ -18,11 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dfsek.terra.api.event.events.platform.PlatformInitializationEvent;
-import com.dfsek.terra.nukkit.config.EasyConfig;
 import com.dfsek.terra.nukkit.generator.TerraGenerator;
 
 import static com.dfsek.terra.nukkit.config.MyConfig.BLOCK_REPLACEMENTS_SOURCE;
-import static com.dfsek.terra.nukkit.config.MyConfig.initConfig;
+import static com.dfsek.terra.nukkit.config.MyConfig.loadConfig;
 
 
 public class TerraNukkitPlugin extends PluginBase implements Listener {
@@ -32,7 +29,7 @@ public class TerraNukkitPlugin extends PluginBase implements Listener {
     public static TerraNukkitPlugin instance;
     public static NukkitPlatform platform;
 
-    public static EasyConfig ec;
+
 
     @Override
     public void onLoad() {
@@ -49,7 +46,7 @@ public class TerraNukkitPlugin extends PluginBase implements Listener {
 
         LOGGER.info("Registering generator...");
         Generator.addGenerator(TerraGenerator.class, "terra", Generator.TYPE_INFINITE);
-        initConfig();
+        loadConfig();
         LOGGER.info("Terra started");
     }
 
@@ -92,8 +89,7 @@ public class TerraNukkitPlugin extends PluginBase implements Listener {
                     return;
                 }
                 BLOCK_REPLACEMENTS_SOURCE.put(jeKey, "minecraft:air");
-                ec.set("block_replacements", BLOCK_REPLACEMENTS_SOURCE);
-                ec.save();
+                MyConfig.saveConfig();
                 MyConfig.applyBlockReplacements();
                 String addMsg = String.format("[Debug] 已添加替换规则: %s -> minecraft:air 并保存配置", jeKey);
                 event.getPlayer().sendMessage(addMsg);
@@ -123,15 +119,12 @@ public class TerraNukkitPlugin extends PluginBase implements Listener {
             // 无参数时切换状态
             newValue = !MyConfig.DEBUG;
         }
-
         MyConfig.DEBUG = newValue;
-        ec.set("debug", newValue);
-        ec.save();
-
+        MyConfig.saveConfig();
         String status = newValue ? "§a开启" : "§c关闭";
         String msg = "§7[Terra] 调试模式已" + status + " §7(当前: " + status + ")";
         sender.sendMessage(msg);
-        LOGGER.info("调试模式已" + (newValue ? "开启" : "关闭") + ", 操作者: " + sender.getName());
+        LOGGER.info("调试模式已{}, 操作者: {}", newValue ? "开启" : "关闭", sender.getName());
         return true;
     }
 

@@ -1,0 +1,16 @@
+# 是否开启调试模式
+debug: false
+# 是否启用方块替换功能
+block_replacements_enabled: true
+# 方块替换映射表 (key: blockId)
+block_replacements:
+  minecraft:cactus_flower: "minecraft:air"
+  minecraft:tall_dry_grass: "minecraft:short_grass"
+  minecraft:firefly_bush: "minecraft:short_grass"
+  minecraft:bush: "minecraft:short_grass"
+  minecraft:short_dry_grass: "minecraft:short_grass"
+  minecraft:leaf_litter: "minecraft:air"
+  minecraft:wildflowers: "minecraft:short_grass"
+  minecraft:brown_mushroom_block: "minecraft:air"
+  minecraft:closed_eyeblossom: "minecraft:air"
+  minecraft:red_mushroom_block: "minecraft:air"

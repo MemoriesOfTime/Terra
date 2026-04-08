@@ -1,17 +1,14 @@
 package com.dfsek.terra.nukkit.config;
 
+import cn.nukkit.utils.Config;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.dfsek.terra.nukkit.JeBlockState;
 import com.dfsek.terra.nukkit.Mapping;
 import com.dfsek.terra.nukkit.delegate.NukkitBlockState;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.dfsek.terra.nukkit.TerraNukkitPlugin.ec;
 import static com.dfsek.terra.nukkit.TerraNukkitPlugin.instance;
 import static com.dfsek.terra.nukkit.delegate.NukkitBlockState.BLOCK_REPLACEMENTS;
 
@@ -19,22 +16,29 @@ import static com.dfsek.terra.nukkit.delegate.NukkitBlockState.BLOCK_REPLACEMENT
 public class MyConfig {
 
 
-    @ConfigItem(key = "debug", comment = "是否开启调试模式")
     public static boolean DEBUG = false;
 
-    @ConfigItem(key = "block_replacements_enabled", comment = "是否启用方块替换功能")
     public static boolean BLOCK_REPLACEMENTS_ENABLED = true;
 
-    @ConfigItem(key = "block_replacements", comment = "方块替换映射表")
     public static Map<String, String> BLOCK_REPLACEMENTS_SOURCE = new HashMap<>();
 
-    public static void initConfig() {
-        ec = new EasyConfig(instance.getDataFolder().getPath() + "/block_replacements.yml");
-        ec.loadFromClass(MyConfig.class);
-        ec.load();
+    public static boolean loadConfig() {
+        instance.saveResource("block_replacements.yml");
+        Config config = new Config(instance.getDataFolder().getPath() + "/block_replacements.yml", Config.YAML);
+        DEBUG = config.getBoolean("debug", false);
+        BLOCK_REPLACEMENTS_ENABLED = config.getBoolean("block_replacements_enabled", true);
+        BLOCK_REPLACEMENTS_SOURCE = config.get("block_replacements", new HashMap<>());
         applyBlockReplacements();
+        saveConfig();
+        return true;
     }
-
+    public static void saveConfig() {
+        Config config = new Config(instance.getDataFolder().getPath() + "/block_replacements.yml", Config.YAML);
+        config.set("debug", DEBUG);
+        config.set("block_replacements_enabled", BLOCK_REPLACEMENTS_ENABLED);
+        config.set("block_replacements", BLOCK_REPLACEMENTS_SOURCE);
+        config.save();
+    }
 
     @SuppressWarnings("unchecked")
     public static void applyBlockReplacements() {
