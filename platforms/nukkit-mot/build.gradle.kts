@@ -1,4 +1,5 @@
 repositories {
+    mavenLocal()
     maven("https://repo.lanink.cn/repository/maven-public/") {
         name = "Nukkit-MOT"
     }

@@ -55,14 +55,14 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof NukkitBlockState that)) return false;
-        return blockId == that.blockId;
+        if (this == o) return true;
+        if (!(o instanceof NukkitBlockState that)) return false;
+        return blockId == that.blockId && metadata == that.metadata;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(blockId);
+        return Objects.hash(blockId, metadata);
     }
 
     @Override
