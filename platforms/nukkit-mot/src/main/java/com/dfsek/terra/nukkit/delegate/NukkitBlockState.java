@@ -2,6 +2,7 @@ package com.dfsek.terra.nukkit.delegate;
 
 import cn.nukkit.block.Block;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -27,7 +28,7 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
     );
 
     public static final NukkitBlockState AIR = new NukkitBlockState(0, 0, JeBlockState.fromString("minecraft:air"));
-    public static Map<NukkitBlockState, NukkitBlockState> BLOCK_REPLACEMENTS = new ConcurrentHashMap<>();
+    public static Map<NukkitBlockState, NukkitBlockState> BLOCK_REPLACEMENTS = new HashMap<>();
 
     /**
      * 解析块状态：如果其 blockId 在BLOCK_REPLACEMENTS，返回映射后的替换。
@@ -53,16 +54,17 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
                              || IMPLICIT_WATER_BLOCKS.contains(jeBlockState.getIdentifier());
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof NukkitBlockState that)) return false;
-        return blockId == that.blockId && metadata == that.metadata;
+        return blockId == that.blockId ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(blockId, metadata);
+        return blockId;
     }
 
     @Override
