@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.dfsek.terra.api.block.BlockType;
 import com.dfsek.terra.api.block.state.properties.Property;
@@ -29,13 +28,17 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
 
     public static final NukkitBlockState AIR = new NukkitBlockState(0, 0, JeBlockState.fromString("minecraft:air"));
     public static Map<NukkitBlockState, NukkitBlockState> BLOCK_REPLACEMENTS = new HashMap<>();
+    public static Map<String, NukkitBlockState> BLOCK_IDENTIFIER_REPLACEMENTS = new HashMap<>();
 
     /**
-     * 解析块状态：如果其 blockId 在BLOCK_REPLACEMENTS，返回映射后的替换。
+     * 解析块状态：优先匹配完整块状态，其次匹配 JE identifier 通配规则。
      */
     public static NukkitBlockState resolve(NukkitBlockState state) {
         if(BLOCK_REPLACEMENTS_ENABLED) {
             NukkitBlockState replacement = BLOCK_REPLACEMENTS.get(state);
+            if(replacement != null) return replacement;
+
+            replacement = BLOCK_IDENTIFIER_REPLACEMENTS.get(state.jeBlockState.getIdentifier());
             return replacement == null ? state : replacement;
         }
         return state;
@@ -45,6 +48,8 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
     private final int metadata;
     private final JeBlockState jeBlockState;
     private final boolean containsWater;
+    private final String javaState;
+    private final int hashCode;
 
     public NukkitBlockState(int blockId, int metadata, JeBlockState jeBlockState) {
         this.blockId = blockId;
@@ -52,6 +57,8 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
         this.jeBlockState = jeBlockState;
         this.containsWater = "true".equals(jeBlockState.getPropertyValue("waterlogged"))
                              || IMPLICIT_WATER_BLOCKS.contains(jeBlockState.getIdentifier());
+        this.javaState = jeBlockState.toString(true);
+        this.hashCode = Objects.hash(blockId, metadata, javaState);
     }
 
 
@@ -59,12 +66,14 @@ public final class NukkitBlockState implements com.dfsek.terra.api.block.state.B
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof NukkitBlockState that)) return false;
-        return blockId == that.blockId ;
+        return blockId == that.blockId
+               && metadata == that.metadata
+               && javaState.equals(that.javaState);
     }
 
     @Override
     public int hashCode() {
-        return blockId;
+        return hashCode;
     }
 
     @Override

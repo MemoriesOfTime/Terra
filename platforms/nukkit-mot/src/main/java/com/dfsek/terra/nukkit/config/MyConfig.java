@@ -10,6 +10,7 @@ import com.dfsek.terra.nukkit.Mapping;
 import com.dfsek.terra.nukkit.delegate.NukkitBlockState;
 
 import static com.dfsek.terra.nukkit.TerraNukkitPlugin.instance;
+import static com.dfsek.terra.nukkit.delegate.NukkitBlockState.BLOCK_IDENTIFIER_REPLACEMENTS;
 import static com.dfsek.terra.nukkit.delegate.NukkitBlockState.BLOCK_REPLACEMENTS;
 
 
@@ -42,6 +43,9 @@ public class MyConfig {
 
     @SuppressWarnings("unchecked")
     public static void applyBlockReplacements() {
+        BLOCK_REPLACEMENTS.clear();
+        BLOCK_IDENTIFIER_REPLACEMENTS.clear();
+
         if(!BLOCK_REPLACEMENTS_ENABLED) {
             instance.getLogger().info("方块替换功能已禁用");
             return;
@@ -59,13 +63,17 @@ public class MyConfig {
             try {
                 JeBlockState srcJeState = JeBlockState.fromString(entry.getKey());
                 JeBlockState dstJeState = JeBlockState.fromString(entry.getValue());
-                Mapping.NukkitBlockData srcBeData = Mapping.blockStateJeToBe(srcJeState);
                 Mapping.NukkitBlockData dstBeData = Mapping.blockStateJeToBe(dstJeState);
-                NukkitBlockState srcState = new NukkitBlockState(
-                    srcBeData.blockId(), srcBeData.metadata(), srcJeState);
                 NukkitBlockState dstState = new NukkitBlockState(
                     dstBeData.blockId(), dstBeData.metadata(), dstJeState);
-                BLOCK_REPLACEMENTS.put(srcState, dstState);
+                if(isExactBlockReplacementSource(entry.getKey())) {
+                    Mapping.NukkitBlockData srcBeData = Mapping.blockStateJeToBe(srcJeState);
+                    NukkitBlockState srcState = new NukkitBlockState(
+                        srcBeData.blockId(), srcBeData.metadata(), srcJeState);
+                    BLOCK_REPLACEMENTS.put(srcState, dstState);
+                } else {
+                    BLOCK_IDENTIFIER_REPLACEMENTS.put(srcJeState.getIdentifier(), dstState);
+                }
                 success++;
             } catch(Exception e) {
                 instance.getLogger().info(String.format("加载方块替换规则失败: %s -> %s", entry.getKey(), entry.getValue()));
@@ -73,6 +81,11 @@ public class MyConfig {
             }
         }
         instance.getLogger().info(String.format("方块替换规则加载完成: 成功 %d, 失败 %d", success, failed));
+    }
+
+    private static boolean isExactBlockReplacementSource(String source) {
+        String trimmed = source.trim();
+        return trimmed.contains("[") || trimmed.contains("{");
     }
 
 }
