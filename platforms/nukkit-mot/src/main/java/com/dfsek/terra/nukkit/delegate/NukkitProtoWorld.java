@@ -1,7 +1,6 @@
 package com.dfsek.terra.nukkit.delegate;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.generic.BaseFullChunk;
@@ -54,15 +53,12 @@ public class NukkitProtoWorld implements ProtoWorld {
 
     @Override
     public void setBlockState(int x, int y, int z, BlockState data, boolean physics) {
-        if(y < dimensionData.getMinHeight() || y > dimensionData.getMaxHeight()) {
+        if(NukkitWorldAccess.isOutsideBuildHeight(dimensionData, y)) {
             return;
         }
 
-        NukkitBlockState nukkitBlockState = (NukkitBlockState) data;
-        chunkManager.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
-        if(nukkitBlockState.containsWater()) {
-            chunkManager.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);
-        }
+        NukkitBlockState nukkitBlockState = NukkitBlockState.resolve((NukkitBlockState) data);
+        NukkitWorldAccess.setBlockState(chunkManager, x, y, z, nukkitBlockState);
     }
 
     @Override
@@ -113,7 +109,7 @@ public class NukkitProtoWorld implements ProtoWorld {
 
     @Override
     public int getMaxHeight() {
-        return dimensionData.getMaxHeight();
+        return NukkitWorldAccess.terraMaxHeight(dimensionData);
     }
 
     @Override

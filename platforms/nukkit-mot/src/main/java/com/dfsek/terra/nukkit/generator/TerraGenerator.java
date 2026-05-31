@@ -2,6 +2,7 @@ package com.dfsek.terra.nukkit.generator;
 
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.DimensionData;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.math.NukkitRandom;
@@ -21,6 +22,7 @@ import com.dfsek.terra.nukkit.delegate.NukkitBiome;
 import com.dfsek.terra.nukkit.delegate.NukkitProtoChunk;
 import com.dfsek.terra.nukkit.delegate.NukkitProtoWorld;
 import com.dfsek.terra.nukkit.delegate.NukkitServerWorld;
+import com.dfsek.terra.nukkit.delegate.NukkitWorldAccess;
 import com.dfsek.terra.nukkit.delegate.NukkitWorldProperties;
 
 
@@ -49,7 +51,7 @@ public class TerraGenerator extends Generator {
         this.chunkManager = level;
         this.seed = level.getSeed();
         this.dimensionData = getDimensionData();
-        this.worldProperties = new NukkitWorldProperties(seed, dimensionData.getMinHeight(), dimensionData.getMaxHeight());
+        this.worldProperties = new NukkitWorldProperties(seed, dimensionData.getMinHeight(), NukkitWorldAccess.terraMaxHeight(dimensionData));
         this.serverWorld = new NukkitServerWorld(this, chunkManager, dimensionData);
 
         NukkitPlatform platform = TerraNukkitPlugin.platform;
@@ -106,7 +108,7 @@ public class TerraGenerator extends Generator {
 
         // Set biomes
         int minHeight = dimensionData.getMinHeight();
-        int maxHeight = dimensionData.getMaxHeight();
+        int maxHeight = NukkitWorldAccess.terraMaxHeight(dimensionData);
         for(int x = 0; x < 16; x++) {
             for(int y = minHeight; y < maxHeight; y++) {
                 for(int z = 0; z < 16; z++) {
@@ -142,8 +144,13 @@ public class TerraGenerator extends Generator {
     }
 
     @Override
+    public int getDimension() {
+        return getDimensionSelection().dimension();
+    }
+
+    @Override
     public int getId() {
-        return TYPE_INFINITE;
+        return getDimensionSelection().generatorType();
     }
 
     @Override
@@ -178,6 +185,14 @@ public class TerraGenerator extends Generator {
         return configPack;
     }
 
+    private DimensionSelection getDimensionSelection() {
+        return switch(normalizePackName(getPackName())) {
+            case "TARTARUS" -> new DimensionSelection(Level.DIMENSION_NETHER, TYPE_NETHER);
+            case "REIMAGEND" -> new DimensionSelection(Level.DIMENSION_THE_END, TYPE_THE_END);
+            default -> new DimensionSelection(Level.DIMENSION_OVERWORLD, TYPE_INFINITE);
+        };
+    }
+
     /**
      * Nukkit-MOT stores generator-settings as options.get("preset").
      * Supports both direct pack name and JSON format {"pack":"name"}.
@@ -195,17 +210,25 @@ public class TerraGenerator extends Generator {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> json = new com.google.gson.Gson().fromJson(trimmed, Map.class);
                     Object pack = json.get("pack");
-                    if(pack instanceof String s2) return s2;
+                    if(pack instanceof String s2) return normalizePackName(s2);
                 } catch(Exception e) {
                     LOGGER.warn("Failed to parse generator-settings as JSON: {}", preset);
                 }
             } else {
                 // Direct pack name: Overworld
-                return trimmed;
+                return normalizePackName(trimmed);
             }
         }
 
         // Fallback: try legacy "pack" key
-        return options.get("pack") instanceof String s ? s : null;
+        return options.get("pack") instanceof String s ? normalizePackName(s) : null;
+    }
+
+    private String normalizePackName(String packName) {
+        if(packName == null) return "";
+        return packName.trim();
+    }
+
+    private record DimensionSelection(int dimension, int generatorType) {
     }
 }

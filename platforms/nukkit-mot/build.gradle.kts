@@ -28,6 +28,7 @@ dependencies {
     implementation("com.google.code.gson", "gson", Versions.NukkitMOT.gson)
 
     compileOnly("cn.nukkit", "Nukkit", Versions.NukkitMOT.nukkitMot)
+    testImplementation("cn.nukkit", "Nukkit", Versions.NukkitMOT.nukkitMot)
 
     geyserMappings("GeyserMC.mappings", "items", Versions.Allay.mappings, ext = "json")
     geyserMappings("GeyserMC.mappings", "biomes", Versions.Allay.mappings, ext = "json")
