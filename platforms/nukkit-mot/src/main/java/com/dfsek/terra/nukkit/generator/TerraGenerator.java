@@ -22,6 +22,7 @@ import com.dfsek.terra.nukkit.delegate.NukkitBiome;
 import com.dfsek.terra.nukkit.delegate.NukkitProtoChunk;
 import com.dfsek.terra.nukkit.delegate.NukkitProtoWorld;
 import com.dfsek.terra.nukkit.delegate.NukkitServerWorld;
+import com.dfsek.terra.nukkit.delegate.NukkitWorldAccess;
 import com.dfsek.terra.nukkit.delegate.NukkitWorldProperties;
 
 
@@ -50,7 +51,7 @@ public class TerraGenerator extends Generator {
         this.chunkManager = level;
         this.seed = level.getSeed();
         this.dimensionData = getDimensionData();
-        this.worldProperties = new NukkitWorldProperties(seed, dimensionData.getMinHeight(), dimensionData.getMaxHeight());
+        this.worldProperties = new NukkitWorldProperties(seed, dimensionData.getMinHeight(), NukkitWorldAccess.terraMaxHeight(dimensionData));
         this.serverWorld = new NukkitServerWorld(this, chunkManager, dimensionData);
 
         NukkitPlatform platform = TerraNukkitPlugin.platform;
@@ -107,7 +108,7 @@ public class TerraGenerator extends Generator {
 
         // Set biomes
         int minHeight = dimensionData.getMinHeight();
-        int maxHeight = dimensionData.getMaxHeight();
+        int maxHeight = NukkitWorldAccess.terraMaxHeight(dimensionData);
         for(int x = 0; x < 16; x++) {
             for(int y = minHeight; y < maxHeight; y++) {
                 for(int z = 0; z < 16; z++) {

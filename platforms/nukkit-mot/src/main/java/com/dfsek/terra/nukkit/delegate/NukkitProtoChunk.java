@@ -1,7 +1,6 @@
 package com.dfsek.terra.nukkit.delegate;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.FullChunk;
 import org.jetbrains.annotations.NotNull;
@@ -16,21 +15,18 @@ public record NukkitProtoChunk(FullChunk nukkitChunk, DimensionData dimensionDat
 
     @Override
     public int getMaxHeight() {
-        return dimensionData.getMaxHeight();
+        return NukkitWorldAccess.terraMaxHeight(dimensionData);
     }
 
     @Override
     public void setBlock(int x, int y, int z, @NotNull BlockState blockState) {
         if(x < 0 || x > 15 || z < 0 || z > 15 ||
-           y < dimensionData.getMinHeight() || y > dimensionData.getMaxHeight()) {
+           NukkitWorldAccess.isOutsideBuildHeight(dimensionData, y)) {
             return;
         }
 
         NukkitBlockState nukkitBlockState = NukkitBlockState.resolve((NukkitBlockState) blockState);
-        nukkitChunk.setBlockAtLayer(x, y, z, 0, nukkitBlockState.blockId(), nukkitBlockState.metadata());
-        if(nukkitBlockState.containsWater()) {
-            nukkitChunk.setBlockAtLayer(x, y, z, 1, BlockID.STILL_WATER, 0);
-        }
+        NukkitWorldAccess.setBlockState(nukkitChunk, x, y, z, nukkitBlockState);
     }
 
     @Override
