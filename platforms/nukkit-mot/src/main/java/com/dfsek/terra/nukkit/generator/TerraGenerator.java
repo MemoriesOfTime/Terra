@@ -141,26 +141,15 @@ public class TerraGenerator extends Generator {
     public void populateStructure(int chunkX, int chunkZ) {
         // Structures are handled in populateChunk stages
     }
+
     @Override
     public int getDimension() {
-        String key = options.get("preset") instanceof String s && !s.isEmpty()
-            ? s.trim().split(":")[0] : "";
-        return switch(key) {
-            case "TARTARUS" -> Level.DIMENSION_NETHER;
-            case "REIMAGEND" -> Level.DIMENSION_THE_END;
-            default -> Level.DIMENSION_OVERWORLD;
-        };
+        return getDimensionSelection().dimension();
     }
 
     @Override
     public int getId() {
-        String key = options.get("preset") instanceof String s && !s.isEmpty()
-            ? s.trim().split(":")[0] : "";
-        return switch(key) {
-            case "TARTARUS" -> TYPE_NETHER;
-            case "REIMAGEND" -> TYPE_THE_END;
-            default -> TYPE_INFINITE;
-        };
+        return getDimensionSelection().generatorType();
     }
 
     @Override
@@ -195,6 +184,14 @@ public class TerraGenerator extends Generator {
         return configPack;
     }
 
+    private DimensionSelection getDimensionSelection() {
+        return switch(normalizePackName(getPackName())) {
+            case "TARTARUS" -> new DimensionSelection(Level.DIMENSION_NETHER, TYPE_NETHER);
+            case "REIMAGEND" -> new DimensionSelection(Level.DIMENSION_THE_END, TYPE_THE_END);
+            default -> new DimensionSelection(Level.DIMENSION_OVERWORLD, TYPE_INFINITE);
+        };
+    }
+
     /**
      * Nukkit-MOT stores generator-settings as options.get("preset").
      * Supports both direct pack name and JSON format {"pack":"name"}.
@@ -212,17 +209,25 @@ public class TerraGenerator extends Generator {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> json = new com.google.gson.Gson().fromJson(trimmed, Map.class);
                     Object pack = json.get("pack");
-                    if(pack instanceof String s2) return s2;
+                    if(pack instanceof String s2) return normalizePackName(s2);
                 } catch(Exception e) {
                     LOGGER.warn("Failed to parse generator-settings as JSON: {}", preset);
                 }
             } else {
                 // Direct pack name: Overworld
-                return trimmed;
+                return normalizePackName(trimmed);
             }
         }
 
         // Fallback: try legacy "pack" key
-        return options.get("pack") instanceof String s ? s : null;
+        return options.get("pack") instanceof String s ? normalizePackName(s) : null;
+    }
+
+    private String normalizePackName(String packName) {
+        if(packName == null) return "";
+        return packName.trim();
+    }
+
+    private record DimensionSelection(int dimension, int generatorType) {
     }
 }
